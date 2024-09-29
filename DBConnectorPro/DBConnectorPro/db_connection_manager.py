@@ -183,6 +183,7 @@ class DB_Connection(ConnectingAttributesMixin):
         self.user_key.set_property_manager(self.property_manager)
         # Setze UserKey für PropertyManager
         self.property_manager.set_user_key(self.user_key)
+        self._setup_connection()
 
     def set_user(self, user_key: str):
         self.user_key.set_user_key(user_key)
@@ -248,5 +249,6 @@ if __name__ == "__main__":
 # TODO die Hauptklasse teilen, eine Klasse DB_query_output,
 # TODO eine Methode drop_dublicated die auch mit durch Joins qualifizierte Spalten-Namen, die sich am Präfix
 #  unterscheiden klar kommt.
+# TODO _private_methode how _setup_connection prove about their correct application for the describe as private.
 # TODO den getter im default ausprobieren, wenn keine json angelegt ist
 # TODO Tests und Exceptions
