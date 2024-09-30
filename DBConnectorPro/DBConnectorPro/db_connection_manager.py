@@ -222,7 +222,6 @@ class DB_Connection(ConnectingAttributesMixin):
         tabelle = tabulate(df, headers=header, tablefmt="presto")
         print(tabelle)
 
-
 def main():
     cnxnstring = DB_Connection(file_path="Test.json")
     cnxnstring.set_user("test1")
