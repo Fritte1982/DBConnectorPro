@@ -206,7 +206,7 @@ class DB_Connection(ConnectingAttributesMixin):
             f"Trusted_Connection={self.win_auth}"
         )
         self.cnxn_string = cnxn_string
-        print(f"ich wurde aufgerufen {self.cnxn_string}")
+        #print(f"ich wurde aufgerufen {self.cnxn_string}")
         
     def connect_n_cursor(self):
         cnxn = pyodbc.connect(self.cnxn_string)
