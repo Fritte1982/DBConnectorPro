@@ -219,27 +219,27 @@ class DB_Connection(ConnectingAttributesMixin):
         if not header:
             header = self.header_list
         df = pd.DataFrame(data=data, columns=header)
-        df = df_drop_duplicated(df)
+        df = self.df_drop_duplicated(df)
         header =df.columns.tolist() # ohne dies stimmten Spalten und Daten nicht
         date_for_tabulate = df.values.tolist() # ohne dies stimmten Spalten und Daten nicht
         tabelle = tabulate(tabular_data=date_for_tabulate, headers=header, tablefmt="presto")
         print(tabelle)
         
     
-def df_drop_duplicated(df: pd.DataFrame ) -> pd.DataFrame:
-    clean_columns: pd.Index = df.columns.str.replace(r'^[^\.]*\.', '', regex=True)
-    duplicated_mask: pd.Series = clean_columns.duplicated()
-    
-    # Erstelle eine Maske, die nur die ersten Vorkommen der Spaltennamen beibehält
-    bool_mask = ~duplicated_mask
-    
-    # Wähle die Spalten mit eindeutigen Namen aus
-    unique_df: pd.DataFrame = df.loc[:, bool_mask]
-    
-    # Setze die Spaltennamen des DataFrames auf die bereinigten Spaltennamen
-    unique_df.columns = clean_columns[bool_mask]
-    
-    return unique_df  
+    def df_drop_duplicated(self,df: pd.DataFrame ) -> pd.DataFrame:
+        clean_columns: pd.Index = df.columns.str.replace(r'^[^\.]*\.', '', regex=True)
+        duplicated_mask: pd.Series = clean_columns.duplicated()
+        
+        # Erstelle eine Maske, die nur die ersten Vorkommen der Spaltennamen beibehält
+        bool_mask = ~duplicated_mask
+        
+        # Wähle die Spalten mit eindeutigen Namen aus
+        unique_df: pd.DataFrame = df.loc[:, bool_mask]
+        
+        # Setze die Spaltennamen des DataFrames auf die bereinigten Spaltennamen
+        unique_df.columns = clean_columns[bool_mask]
+        
+        return unique_df  
     
 
 def main():
