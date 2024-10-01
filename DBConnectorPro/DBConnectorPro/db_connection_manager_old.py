@@ -130,7 +130,6 @@ class PropertyManager:
         else:
             raise KeyError(f"Der Schlüssel '{key}' ist nicht in den Standardwerten definiert")
         self.user_key.save_user_attributes()
-        
 
     def reset_to_defaults(self):
         self._attributes = self.default_values.copy()
@@ -148,8 +147,7 @@ class ConnectingAttributesMixin:
     @driver.setter
     def driver(self, value):
         self.property_manager.set("driver", value)
-        self._setup_connection()
-        
+
     @property
     def host(self):
         return self.property_manager.get("host")
@@ -157,19 +155,15 @@ class ConnectingAttributesMixin:
     @host.setter
     def host(self, value):
         self.property_manager.set("host", value)
-        self._setup_connection()
-        
 
     @property
     def db_name(self):
         return self.property_manager.get("db_name")
-        
 
     @db_name.setter
     def db_name(self, value):
         self.property_manager.set("db_name", value)
-        self._setup_connection()
-                
+
     @property
     def win_auth(self):
         return self.property_manager.get("win_auth")
@@ -177,7 +171,7 @@ class ConnectingAttributesMixin:
     @win_auth.setter
     def win_auth(self, value):
         self.property_manager.set("win_auth", value)
-        self._setup_connection()
+
 
 class DB_Connection(ConnectingAttributesMixin):
     def __init__(self, file_path: str = "excer_sql_attributes.json", initial_values=None, default=None) -> None:
@@ -189,14 +183,10 @@ class DB_Connection(ConnectingAttributesMixin):
         self.user_key.set_property_manager(self.property_manager)
         # Setze UserKey für PropertyManager
         self.property_manager.set_user_key(self.user_key)
-        
         self._setup_connection()
-    
-    
 
     def set_user(self, user_key: str):
         self.user_key.set_user_key(user_key)
-        self._setup_connection()
 
     def _setup_connection(self):
         cnxn_string = (
@@ -206,8 +196,7 @@ class DB_Connection(ConnectingAttributesMixin):
             f"Trusted_Connection={self.win_auth}"
         )
         self.cnxn_string = cnxn_string
-        print(f"ich wurde aufgerufen {self.cnxn_string}")
-        
+
     def connect_n_cursor(self):
         cnxn = pyodbc.connect(self.cnxn_string)
         cursor = cnxn.cursor()
@@ -254,18 +243,16 @@ class DB_Connection(ConnectingAttributesMixin):
     
 
 def main():
-    cnxnstring = DB_Connection(file_path="Test.json", default=False)
+    cnxnstring = DB_Connection(file_path="Test.json")
+    cnxnstring.set_user("test1")
     cnxnstring.driver = "{ODBC Driver 17 for SQL Server}"
-    #cnxnstring.set_user("test2")
-    
-    print(cnxnstring.db_name)
-    #cnxnstring._setup_connection()
-    cnxnstring.set_user("test2")
-    cnxnstring.db_name ="Uebung"
+    print(cnxnstring.driver)
+    # cnxnstring.set_user("test2")
+    # cnxnstring.db_name ="Northwind"
     # print(cnxnstring.db_name)
-    
+    cnxnstring._setup_connection()
     select_anweisung = "SELECT TOP (10) * "
-    from_quali = "FROM employee e "
+    from_quali = "FROM employees e "
     query = select_anweisung + from_quali
     cnxnstring.daten_spalten(query)
     cnxnstring.tabellen_ausgabe()
