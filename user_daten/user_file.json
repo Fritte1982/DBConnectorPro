@@ -1,0 +1,26 @@
+{
+    "kurz_gut": {
+        "db_name": "SQL_Kurz"
+    },
+    "TSQL4_user": {
+        "db_name": "TSQLV4"
+    },
+    "sql_fast": {
+        "db_name": "Northwind"
+    },
+    "WWI_Aufgaben": {
+        "db_name": "WideWorldImporters"
+    },
+    "chinook_project": {
+        "db_name": "Chinook"
+    },
+    "Einfuehrung_Wolf": {
+        "db_name": "AdventureWorks2019"
+    },
+    "Udemy_dummie": {
+        "db_name": "Uebung"
+    },
+    "sps_wenzel": {
+        "db_name": "AdventureWorks2019"
+    }
+}

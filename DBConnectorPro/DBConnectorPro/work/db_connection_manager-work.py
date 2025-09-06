@@ -4,8 +4,6 @@ import os
 import pandas as pd
 from tabulate import tabulate
 from pathlib import Path
-import streamlit as st
-from .streamlit_klasse import streamlit_server
 
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_colwidth', None)
@@ -13,7 +11,7 @@ pd.set_option('display.max_colwidth', None)
 
 class DefaultValues:
     def __init__(self) -> None:
-        self.default_values = {'driver': "{ODBC Driver 18 for SQL Server}",
+        self.default_values = {'driver': "{ODBC Driver 17 for SQL Server}",
                                "host": r"FRITTE2\SQLEXPRESS",
                                "db_name": "employees",
                                "win_auth": "yes"}
@@ -132,7 +130,7 @@ class PropertyManager:
         else:
             raise KeyError(f"Der Schlüssel '{key}' ist nicht in den Standardwerten definiert")
         self.user_key.save_user_attributes()
-
+        
 
     def reset_to_defaults(self):
         self._attributes = self.default_values.copy()
@@ -151,7 +149,7 @@ class ConnectingAttributesMixin:
     def driver(self, value):
         self.property_manager.set("driver", value)
         self._setup_connection()
-
+        
     @property
     def host(self):
         return self.property_manager.get("host")
@@ -160,18 +158,18 @@ class ConnectingAttributesMixin:
     def host(self, value):
         self.property_manager.set("host", value)
         self._setup_connection()
-
+        
 
     @property
     def db_name(self):
         return self.property_manager.get("db_name")
-
+        
 
     @db_name.setter
     def db_name(self, value):
         self.property_manager.set("db_name", value)
         self._setup_connection()
-
+                
     @property
     def win_auth(self):
         return self.property_manager.get("win_auth")
@@ -182,7 +180,7 @@ class ConnectingAttributesMixin:
         self._setup_connection()
 
 class DB_Connection(ConnectingAttributesMixin):
-    def __init__(self, file_path: str = None, initial_values=None, default=None, encoding=None) -> None:
+    def __init__(self, file_path: str = None, initial_values=None, default=None) -> None:
         self.file_manager = FileManager(file_path)
         self.user_key = UserKey(self.file_manager)
         self.property_manager = PropertyManager(self.file_manager, initial_values=initial_values, default=default)
@@ -190,10 +188,16 @@ class DB_Connection(ConnectingAttributesMixin):
         self.user_key.set_property_manager(self.property_manager)
         # Setze UserKey für PropertyManager
         self.property_manager.set_user_key(self.user_key)
-        self.encoding = encoding
+        
         self._setup_connection()
-
-
+    
+    def ddl_ausführen(self, statment):
+        self.satement = statment
+        self.cursor = self.connect_n_cursor()
+        self.cursor.execute(statment)
+        self.cnxn.commit()
+        self.cnxn.close()
+        
 
     def set_user(self, user_key: str):
         self.user_key.set_user_key(user_key)
@@ -205,124 +209,76 @@ class DB_Connection(ConnectingAttributesMixin):
             f"Driver={self.driver}; "
             f"Server={self.host}; "
             f"database={self.db_name}; "
-            f"Trusted_Connection={self.win_auth};"
-            "TrustServerCertificate=yes; "
+            f"Trusted_Connection={self.win_auth}"
         )
         self.cnxn_string = cnxn_string
         # print(f"ich wurde aufgerufen {self.cnxn_string}")
-
+        
     def connect_n_cursor(self):
         cnxn = pyodbc.connect(self.cnxn_string)
-        if self.encoding :
-            cnxn.setdecoding(pyodbc.SQL_CHAR, encoding=self.encoding)
-            cnxn.setdecoding(pyodbc.SQL_WCHAR, encoding=self.encoding)
-            cnxn.setencoding(self.encoding)
         cursor = cnxn.cursor()
         self.cursor = cursor
         self.cnxn = cnxn
         return self.cursor
 
-
-    def daten_spalten(self, query: str, commit=None):
+    def daten_spalten(self, query: str):
         self.query = query
         self.cursor = self.connect_n_cursor()
         self.cursor.execute(query)
-        if commit:                    # ddl mit Tabellenausgabe, in ihrem case ein execute sp mit Select-Ausgabe.
-            self.cnxn.commit()
         self.data = self.cursor.fetchall()
         describe = self.cursor.description
         self.header_list = [i[0] for i in describe]
+        self.cnxn.close()
         return self.data, self.header_list
 
-    def ddl_ausführen(self, statment):
-        self.satement = statment
-        self.cursor = self.connect_n_cursor()
-        self.cursor.execute(statment)
-        self.cnxn.commit()
-        self.cnxn.close()
-
-    def tabellen_ausgabe(self,drop_duplicate=True, data=None, header=None, tblfrmt=None):
-        df = self.df_return(drop_duplicate=drop_duplicate, data=data, header=header)
-        header =df.columns.tolist() # ohne dies stimmten Spalten und Daten nicht
-        date_for_tabulate = df.values.tolist() # ohne dies stimmten Spalten und Daten nicht
-        if not tblfrmt:
-            tblfrmt = "orgtbl"
-        else:
-            tblfrmt = tblfrmt
-        tabelle = tabulate(tabular_data=date_for_tabulate, headers=header, tablefmt=tblfrmt)
-        print(tabelle)
-        self.cnxn.close()
-
-    def df_return(self, drop_duplicate=True,  data=None, header=None)->pd.DataFrame:
+    def tabellen_ausgabe(self, data=None, header=None):
         if not data:
             data = self.data
             data = [list(i) for i in data]
         if not header:
             header = self.header_list
         df = pd.DataFrame(data=data, columns=header)
-        if drop_duplicate == True:
-            df_unique = self.df_drop_duplicated(df)
-            return df_unique
-        else:
-            return df
-
+        df = self.df_drop_duplicated(df)
+        header =df.columns.tolist() # ohne dies stimmten Spalten und Daten nicht
+        date_for_tabulate = df.values.tolist() # ohne dies stimmten Spalten und Daten nicht
+        tabelle = tabulate(tabular_data=date_for_tabulate, headers=header, tablefmt="presto")
+        print(tabelle)
+        
+        
+    
     def df_drop_duplicated(self,df: pd.DataFrame ) -> pd.DataFrame:
         clean_columns: pd.Index = df.columns.str.replace(r'^[^\.]*\.', '', regex=True)
         duplicated_mask: pd.Series = clean_columns.duplicated()
-
+        
         # Erstelle eine Maske, die nur die ersten Vorkommen der Spaltennamen beibehält
         bool_mask = ~duplicated_mask
-
+        
         # Wähle die Spalten mit eindeutigen Namen aus
         unique_df: pd.DataFrame = df.loc[:, bool_mask]
-
+        
         # Setze die Spaltennamen des DataFrames auf die bereinigten Spaltennamen
         unique_df.columns = clean_columns[bool_mask]
-
-        return unique_df
-
-    def streamlit_ausgabe(self, df=None, drop_ducplicate=True)->None:
-        self.start_server = streamlit_server()
-        if not df:
-            self.df = self.df_return(drop_duplicate= drop_ducplicate,
-                                data=None, header=None)
-
-        else:
-            self.df = df
-        st.dataframe(self.df)
-        self.start_server.start_streamlit()
+        
+        return unique_df  
+    
 
 def main():
-    # cnxnstring = DB_Connection(file_path="Test.json", default=False)
-    # cnxnstring.driver = "{ODBC Driver 17 for SQL Server}"
-    # #cnxnstring.set_user("test2")
-    #
+    cnxnstring = DB_Connection(file_path="Test.json", default=False)
+    cnxnstring.driver = "{ODBC Driver 17 for SQL Server}"
+    #cnxnstring.set_user("test2")
+    
+    print(cnxnstring.db_name)
+    #cnxnstring._setup_connection()
+    cnxnstring.set_user("test2")
+    cnxnstring.db_name ="Uebung"
     # print(cnxnstring.db_name)
-    # #cnxnstring._setup_connection()
-    # cnxnstring.set_user("test2")
-    # cnxnstring.db_name ="Uebung"
-    # # print(cnxnstring.db_name)
-    #
-    # select_anweisung = "SELECT TOP (10) * "
-    # from_quali = "FROM employee e "
-    # query = select_anweisung + from_quali
-    # cnxnstring.daten_spalten(query)
-    # cnxnstring.tabellen_ausgabe()
-    from paths.path_attributes import package_path
-    from paths.path_attributes import user_file as usf
+    
+    select_anweisung = "SELECT TOP (10) * "
+    from_quali = "FROM employee e "
+    query = select_anweisung + from_quali
+    cnxnstring.daten_spalten(query)
+    cnxnstring.tabellen_ausgabe()
 
-    query = """SELECT  *
-    FROM Employees
-    WHERE  City ='Seattle' OR Country = 'UK'
-    """
-    user: str = "sql_fast"
-    user_file = usf
-    # user_file = str(user_file)
-    db_name: str = "Northwind"
-    fast_book = DB_Connection(user_file)
-    fast_book.set_user(user)
-    fast_book.daten_spalten(query)
-    fast_book.tabellen_ausgabe()
 
 if __name__ == "__main__":
     main()
@@ -337,13 +293,8 @@ if __name__ == "__main__":
 # TODO _private_methode how _setup_connection prove about their correct application for the describe as private.
 # TODO den getter im default ausprobieren, wenn keine json angelegt ist
 # TODO Tests und Exceptions
-# TODO Json ist nach intialiserung nicht im CWD zu fiden.
-# TODO eine Methode save_actuallty_attributes, die die verwendenten Attribute im aktuellen
+# TODO Json ist nach intialiserung nicht im CWD zu fiden. 
+# TODO eine Methode save_actuallty_attributes, die die verwendenten Attribute im aktuellen 
 # user speichert
-# TODO in der Klasse DB_Connection(), "tabellen_ausgabe()" teilen mit einer methode die
-# ein df ausgibt
-# TODO flag für drop_duplicated
-# TODO duplicate Spalten eine logik finden die zwischen Spalten mit identischen Inhalten und
-# nur gleichen Spaltennamen aber unterschiedlichen Values,  in verschiedenen Tables unterscheidet.
-# TODO streamlite mit ein/aus einbinden
-# TODO ddl_ausführen()-Methode um params erweitern
+# TODO in cursor_n_connection() der DB_connection-Klasse ein Flage mit autocommit auf None
+# und wahl weise auf True setzbar implementieren. 
