@@ -1,4 +1,4 @@
-from DBConnectorPro.db_connection_manager import DB_Connection
+from DBConnectorPro import DB_Connection
 import os
 
 user: str = "emp_exercise_1"

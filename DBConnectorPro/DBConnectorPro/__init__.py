@@ -1,7 +1,7 @@
 # __init__.py
+from .streamlit_klasse import streamlit_server
 from .db_connection_manager import DB_Connection
 from pathlib import Path
-from .streamlit_klasse import streamlit_server
 import sys
 
 # Absoluter Pfad dynamisch bestimmen
