@@ -73,3 +73,47 @@ Ja, auf Udemy gibt es mehrere Kurse, die dir beibringen, wie du eigene Python-Pa
 
 Wenn du weitere Unterstützung benötigst oder spezifische Fragen hast, stehe ich dir gerne zur Verfügung!
 
+---
+
+Natürlich! Hier sind einige empfehlenswerte Lernressourcen, um dich mit der `pyproject.toml` vertraut zu machen – ideal für den Einstieg in modernes Python-Projektmanagement:
+
+---
+
+### 📘 1. **Python Packaging User Guide – Writing your pyproject.toml**
+
+Die offizielle Anleitung der Python Packaging Authority (PyPa). Sie erklärt die Struktur und Verwendung der `pyproject.toml` und deren Bedeutung für den Build-Prozess. Ein Muss für alle, die Python-Pakete erstellen oder veröffentlichen möchten. ([Python Packaging][1])
+
+---
+
+### 🐍 2. **Real Python – How to Manage Python Projects With pyproject.toml**
+
+Ein praxisorientierter Artikel, der Schritt für Schritt zeigt, wie man ein Python-Projekt mit `pyproject.toml` aufsetzt, Abhängigkeiten verwaltet und das Projekt lokal installiert. Ideal für Einsteiger, die den gesamten Workflow verstehen möchten. ([Real Python][2])
+
+---
+
+### 🧠 3. **Hossein Nejati – Understanding pyproject.toml**
+
+Ein Einsteigerartikel, der die Grundlagen von `pyproject.toml` erklärt und zeigt, wie man es effektiv in Python-Projekten einsetzt. Besonders hilfreich für Entwickler, die den Übergang von `setup.py` zu `pyproject.toml` verstehen möchten. ([Medium][3])
+
+---
+
+### 🛠️ 4. **devsjc – The Complete Guide to pyproject.toml**
+
+Ein umfassender Leitfaden, der zeigt, wie man `pyproject.toml` verwendet, um verschiedene Tools zu konfigurieren, Entwicklungsabhängigkeiten zu verwalten und das Projekt für die Veröffentlichung vorzubereiten. Besonders nützlich für Entwickler, die eine vollständige Kontrolle über ihre Projektkonfiguration wünschen. ([devsjc.github.io][4])
+
+---
+
+### 📦 5. **Make your Python package PyPI ready – pyproject.toml**
+
+Ein praktischer Leitfaden, der Schritt für Schritt zeigt, wie man ein Python-Paket mit `pyproject.toml` für die Veröffentlichung auf PyPI vorbereitet. Ideal für Entwickler, die ihre Pakete mit minimalem Aufwand veröffentlichen möchten. ([pyOpenSci][5])
+
+---
+
+Wenn du möchtest, kann ich dir auch ein einfaches Beispiel für eine `pyproject.toml` erstellen, das du direkt in deinem Projekt verwenden kannst. Lass es mich einfach wissen!
+
+[1]: https://packaging.python.org/en/latest/guides/writing-pyproject-toml/?utm_source=chatgpt.com "Writing your pyproject.toml - Python Packaging User Guide"
+[2]: https://realpython.com/python-pyproject-toml/?utm_source=chatgpt.com "How to Manage Python Projects With pyproject.toml"
+[3]: https://hosseinnejati.medium.com/understanding-pyproject-toml-the-key-to-modern-python-projects-for-beginners-7a9a002a2c8c?utm_source=chatgpt.com "Understanding pyproject.toml: The Key to Modern Python ..."
+[4]: https://devsjc.github.io/blog/20240627-the-complete-guide-to-pyproject-toml/?utm_source=chatgpt.com "The Complete Guide to pyproject.toml · devsjc blogs //"
+[5]: https://www.pyopensci.org/python-package-guide/tutorials/pyproject-toml.html?utm_source=chatgpt.com "Make your Python package PyPI ready - pyproject.toml"
+
