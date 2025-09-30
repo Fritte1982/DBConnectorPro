@@ -23,7 +23,7 @@ class DefaultValues:
 
 
 class FileManager:
-    def __init__(self, file_path: str = "excer_sql_attributes.json") -> None:
+    def __init__(self, file_path: str = r"user_daten/user_file.json") -> None:
         self.file_path = Path(file_path)
         self._ensure_directory_exists()
 
